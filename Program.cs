@@ -1,6 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.SemanticFunctions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.SemanticKernel.Orchestration;
 
 namespace WriteABlog
 {
@@ -20,10 +21,25 @@ namespace WriteABlog
 
             builder.Configure(kernalConfig => {
                 kernalConfig.AddOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey);                
-            });
+            });            
 
             IKernel kernel = builder.Build();
 
+            Console.Write("Please enter the topic: ");
+            string? topic = Console.ReadLine();
+            
+            var plugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
+
+            var context = new ContextVariables();
+            context.Set("topic", topic);            
+
+            var title = await kernel.RunAsync(context, plugin["Title"]);
+
+            Console.WriteLine(title);
+        }
+
+        async Task WriteABlog(IKernel kernel)
+        {
             Console.Write("Please enter the topic: ");
             string? topic = Console.ReadLine();
             string prompt = $"""
@@ -45,7 +61,7 @@ namespace WriteABlog
 
             var functionConfig = new SemanticFunctionConfig(promptConfig, promptTemplate);
 
-            var function = kernel.RegisterSemanticFunction("WriteABlog", functionConfig);            
+            var function = kernel.RegisterSemanticFunction("WriteABlog", functionConfig);
 
             var blog = await kernel.RunAsync(function);
 
