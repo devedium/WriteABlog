@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "a function that generates blog table of contents",
+  "completion": {
+    "max_tokens": 2000,
+    "temperature": 0.2
+  },
+  "input": {
+    "parameters": [
+      {
+        "name": "title",
+        "description": "The title to generate a blog for",
+        "defaultValue": ""
+      },
+      {
+        "name": "subtitle",
+        "description": "The subtitle to generate a blog for",
+        "defaultValue": ""
+      }
+    ]
+  }
+}

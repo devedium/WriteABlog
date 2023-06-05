@@ -2,9 +2,21 @@
 using Microsoft.SemanticKernel.SemanticFunctions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.AI.ImageGeneration;
+using System.Net;
+using System.Reflection;
 
 namespace WriteABlog
 {
+    public class Blog
+    {
+        public string Topic { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Subtitle { get; set; } = "";
+        public string CoverUrl { get; set; } = "";
+        public string TableOfContents { get; set; } = "";
+        public IList<string> Chapters { get; set; } = new List<string>();
+    }
     internal class Program
     {
         static async Task Main(string[] args)
@@ -17,25 +29,43 @@ namespace WriteABlog
 
             string? apiKey = config.GetSection("apiKey").Value;
 
-            var builder = Kernel.Builder;
+            var builder = Kernel.Builder
+                                .WithOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey)
+                                .WithOpenAIImageGenerationService(apiKey: apiKey);
 
-            builder.Configure(kernalConfig => {
-                kernalConfig.AddOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey);                
-            });            
-
-            IKernel kernel = builder.Build();
+            IKernel kernel = builder.Build();            
 
             Console.Write("Please enter the topic: ");
             string? topic = Console.ReadLine();
             
             var plugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
+            var stylePlugin = kernel.ImportSkill(new Plugins.StyleABlog(), "StyleABlog");
 
             var context = new ContextVariables();
-            context.Set("topic", topic);            
+            context.Set("topic", topic);
 
             var title = await kernel.RunAsync(context, plugin["Title"]);
-
             Console.WriteLine(title);
+            context.Set("title", title.Result);
+            
+            var subtitle = await kernel.RunAsync(context, plugin["SubTitle"]);
+            Console.WriteLine(subtitle);
+            context.Set("subtitle", subtitle.Result);            
+
+            var cover = await kernel.RunAsync(context, plugin["Cover"]);
+            Console.WriteLine(cover);            
+
+            IImageGeneration dallE = kernel.GetService<IImageGeneration>();            
+            var image = await dallE.GenerateImageAsync(cover.Result, 1024, 1024); 
+            
+            using (WebClient client = new WebClient())
+            {
+                string url = image;  // replace with your URL
+                Uri uri = new Uri(url);
+                string localPath = System.IO.Path.GetFileName(uri.LocalPath);
+
+                client.DownloadFile(url, localPath);
+            }
         }
 
         async Task WriteABlog(IKernel kernel)

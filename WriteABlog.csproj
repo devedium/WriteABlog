@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="0.14.547.1-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="0.15.230531.5-preview" />
   </ItemGroup>
 
   <ItemGroup>
