@@ -1,0 +1,15 @@
+GENERATE CHAPTER {{$chapter}} FOR THE BLOG BASED ON THE CONTEXT BELOW:
++++++
+TOPIC:{{$topic}}
+
+TITLE:{{$title}}
+
+SUBTITLE:{{$subtitle}}
+
+{{$TableOfContents}}
+
+CONTEXT:
+{{Memory.recall  $chapter}}
++++++
+
+

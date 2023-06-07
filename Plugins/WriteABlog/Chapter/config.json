@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "type": "completion",
-  "description": "a function that generates blog subtitle",
+  "description": "a function that generates one blog chapter",
   "completion": {
-    "max_tokens": 500,
-    "temperature": 0.2
+    "max_tokens": 4000,
+    "temperature": 0.3
   },
   "input": {
     "parameters": [
