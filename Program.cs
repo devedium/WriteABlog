@@ -1,18 +1,15 @@
-﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.SemanticFunctions;
+﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
-using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.AI.ImageGeneration;
-using System.Net;
-using System.Reflection;
 using Microsoft.SemanticKernel.CoreSkills;
 using Microsoft.SemanticKernel.Memory;
-using HtmlAgilityPack;
-using Azure;
-using static System.Net.Mime.MediaTypeNames;
-using System.Text.RegularExpressions;
+using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.SemanticFunctions;
+using System.Net;
 using System.Text;
-using static Microsoft.SemanticKernel.Connectors.AI.OpenAI.ImageGeneration.ImageGenerationResponse;
+using System.Text.RegularExpressions;
 
 namespace WriteABlog
 {
@@ -36,13 +33,32 @@ namespace WriteABlog
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("env") ?? "dev"}.json", optional: true)                
                 .Build();
 
-            string? apiKey = config.GetSection("apiKey").Value;
+            string apiKey = config.GetSection("apiKey").Value ?? "";
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                Console.WriteLine("invalid api key.");
+                return;
+            }
+
+            using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                                                    builder.AddSimpleConsole(options =>
+                                                    {
+                                                        options.IncludeScopes = true;
+                                                        options.SingleLine = true;
+                                                        options.TimestampFormat = "HH:mm:ss ";                                                        
+                                                    }));
+
+            ILogger logger = loggerFactory.CreateLogger("WriteABlog");
+            HttpClientHandler httpClientHandler = new HttpClientHandler();
+            TextCompletionLogger textCompletionLogger = new TextCompletionLogger(httpClientHandler, logger);
 
             var builder = Kernel.Builder
                                 .WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002", apiKey)
-                                .WithOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey)
-                                .WithOpenAIImageGenerationService(apiKey: apiKey)
-                                .WithMemoryStorage(new VolatileMemoryStore());
+                                .WithOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey, httpClient: new HttpClient(textCompletionLogger))
+                                .WithOpenAIImageGenerationService(apiKey: apiKey)                                                             
+                                .WithMemoryStorage(new VolatileMemoryStore())
+                                .WithLogger(logger);
 
             IKernel kernel = builder.Build();            
 
@@ -83,37 +99,37 @@ namespace WriteABlog
                 }
             }
 
-            var plugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
+            var writePlugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
             var blogStyle = new Plugins.StyleABlog();
             var stylePlugin = kernel.ImportSkill(blogStyle, "StyleABlog");
-            kernel.ImportSkill(new TextMemorySkill(), "Memory");
+            kernel.ImportSkill(new TextMemorySkill(collection: topic, relevance: "0.8", limit: "1"));
 
             var variables = new ContextVariables();
             variables.Set("input", topic);            
 
             var skContext = await kernel.RunAsync(variables,
                             stylePlugin["Topic"],
-                            plugin["Title"],
+                            writePlugin["Title"],
                             stylePlugin["Title"],
-                            plugin["Subtitle"],
+                            writePlugin["Subtitle"],
                             stylePlugin["Subtitle"],
-                           // plugin["Cover"],
-                           // stylePlugin["Cover"],
-                            plugin["TableOfContents"],
+                            writePlugin["Cover"],
+                            stylePlugin["Cover"],
+                            writePlugin["TableOfContents"],
                             stylePlugin["TableOfContents"]);
 
-            //IImageGeneration dallE = kernel.GetService<IImageGeneration>();
-            //var imageUrl = await dallE.GenerateImageAsync(blogStyle.blog.CoverDescription, 1024, 1024);
-            //blogStyle.blog.CoverUrl = imageUrl;
+            IImageGeneration dallE = kernel.GetService<IImageGeneration>();
+            var imageUrl = await dallE.GenerateImageAsync(blogStyle.blog.CoverDescription, 1024, 1024);
+            blogStyle.blog.CoverUrl = imageUrl;
 
-            //using (WebClient client = new WebClient())
-            //{
-            //    string url = imageUrl;  
-            //    Uri uri = new Uri(url);
-            //    string localPath = System.IO.Path.GetFileName(uri.LocalPath);
+            using (WebClient client = new WebClient())
+            {
+                string url = imageUrl;
+                Uri uri = new Uri(url);
+                string localPath = System.IO.Path.GetFileName(uri.LocalPath);
 
-            //    client.DownloadFile(url, localPath);
-            //}
+                client.DownloadFile(url, localPath);
+            }
 
             string[] chapters = SplitIntoChapters(blogStyle.blog.TableOfContents);
             
@@ -123,7 +139,7 @@ namespace WriteABlog
                 
                 variables.Set("chapter", chapter);
                 skContext = await kernel.RunAsync(variables,
-                            plugin["Chapter"],
+                            writePlugin["Chapter"],
                             stylePlugin["Chapter"]);
             }
 
@@ -136,7 +152,7 @@ namespace WriteABlog
             sb.AppendLine($"# {blog.Title}");
             sb.AppendLine($"{blog.Subtitle}\r\n");            
             sb.AppendLine($"![{blog.Title}]({blog.CoverUrl})\r\n");
-            
+            sb.AppendLine($"{blog.TableOfContents}\r\n");
             foreach (string chapter in blog.Chapters)
             {
                 sb.AppendLine(chapter);
