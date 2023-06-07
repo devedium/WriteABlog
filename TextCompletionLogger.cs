@@ -26,6 +26,7 @@ namespace WriteABlog
             }
             
             response = await base.SendAsync(request, cancellationToken);
+
             return response;
         }        
     }

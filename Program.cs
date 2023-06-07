@@ -6,6 +6,7 @@ using Microsoft.SemanticKernel.AI.ImageGeneration;
 using Microsoft.SemanticKernel.CoreSkills;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.Planning;
 using Microsoft.SemanticKernel.SemanticFunctions;
 using System.Net;
 using System.Text;
@@ -105,7 +106,13 @@ namespace WriteABlog
             kernel.ImportSkill(new TextMemorySkill(collection: topic, relevance: "0.8", limit: "1"));
 
             var variables = new ContextVariables();
-            variables.Set("input", topic);            
+            variables.Set("input", topic);
+
+            //var planner = new SequentialPlanner(kernel);
+            //var plan = await planner.CreatePlanAsync($"Write A Blog with topic: {topic}");            
+            //var ret = await kernel.RunAsync(plan);
+            //Console.WriteLine("Result:");
+            //Console.WriteLine(ret.Result);
 
             var skContext = await kernel.RunAsync(variables,
                             stylePlugin["Topic"],
@@ -143,7 +150,8 @@ namespace WriteABlog
                             stylePlugin["Chapter"]);
             }
 
-            SaveBlogToFile(blogStyle.blog, "blog.md");
+            SaveBlogToFile(blogStyle.blog, "blog.md");            
+
         }
 
         static void SaveBlogToFile(Blog blog, string filePath)

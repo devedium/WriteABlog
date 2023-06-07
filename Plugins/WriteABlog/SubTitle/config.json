@@ -9,8 +9,8 @@
   "input": {
     "parameters": [
       {
-        "name": "topic",
-        "description": "The topic to generate a blog for",
+        "name": "title",
+        "description": "The title of the blog",
         "defaultValue": ""
       }
     ]

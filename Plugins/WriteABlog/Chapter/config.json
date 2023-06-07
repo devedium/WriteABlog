@@ -12,6 +12,21 @@
         "name": "topic",
         "description": "The topic to generate a blog for",
         "defaultValue": ""
+      },
+      {
+        "name": "title",
+        "description": "The title to generate a blog for",
+        "defaultValue": ""
+      },
+      {
+        "name": "subtitle",
+        "description": "The subtitle to generate a blog for",
+        "defaultValue": ""
+      },
+      {
+        "name": "chapter",
+        "description": "The chapter header of the content",
+        "defaultValue": ""
       }
     ]
   }
