@@ -89,7 +89,7 @@ namespace WriteABlog
             kernel.ImportSkill(new TextMemorySkill(), "Memory");
 
             var variables = new ContextVariables();
-            variables.Set("input", topic);
+            variables.Set("input", topic);            
 
             var skContext = await kernel.RunAsync(variables,
                             stylePlugin["Topic"],
@@ -97,8 +97,8 @@ namespace WriteABlog
                             stylePlugin["Title"],
                             plugin["Subtitle"],
                             stylePlugin["Subtitle"],
-                            plugin["Cover"],
-                            stylePlugin["Cover"],
+                           // plugin["Cover"],
+                           // stylePlugin["Cover"],
                             plugin["TableOfContents"],
                             stylePlugin["TableOfContents"]);
 
@@ -116,10 +116,12 @@ namespace WriteABlog
             //}
 
             string[] chapters = SplitIntoChapters(blogStyle.blog.TableOfContents);
+            
             foreach (var chapter in chapters)
             {
-                if (chapter.Contains("Table of Contents", StringComparison.InvariantCultureIgnoreCase)) continue;
-                variables.Set("chapter", chapter.Split(new char[] {'\r','\n'}, StringSplitOptions.RemoveEmptyEntries).First());
+                if (chapter.Contains("Table of Contents", StringComparison.InvariantCultureIgnoreCase)) continue;               
+                
+                variables.Set("chapter", chapter);
                 skContext = await kernel.RunAsync(variables,
                             plugin["Chapter"],
                             stylePlugin["Chapter"]);

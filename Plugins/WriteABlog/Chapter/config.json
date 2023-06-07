@@ -3,7 +3,7 @@
   "type": "completion",
   "description": "a function that generates one blog chapter",
   "completion": {
-    "max_tokens": 4000,
+    "max_tokens": 2500,
     "temperature": 0.3
   },
   "input": {

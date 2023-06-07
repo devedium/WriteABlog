@@ -1,15 +1,13 @@
-GENERATE CHAPTER {{$chapter}} FOR THE BLOG BASED ON THE CONTEXT BELOW:
+FOR THE BLOG BASED ON THE CONTEXT BELOW:
 +++++
 TOPIC:{{$topic}}
-
 TITLE:{{$title}}
-
 SUBTITLE:{{$subtitle}}
-
-{{$TableOfContents}}
-
-CONTEXT:
-{{Memory.recall  $chapter}}
 +++++
+
+GENERATE THE CHAPTER IN MARKDOWN FORMAT FOR:
+{{$chapter}}
+
+
 
 
