@@ -214,23 +214,23 @@ namespace WriteABlog
         async Task WriteABlog_v2(IKernel kernel)
         {
             Console.Write("Please enter the topic: ");
-            string? topic = Console.ReadLine();
+            string topic = Console.ReadLine()??"";
 
-            var plugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
+            var writePlugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
             var stylePlugin = kernel.ImportSkill(new Plugins.StyleABlog(), "StyleABlog");
 
             var variables = new ContextVariables();
             variables.Set("topic", topic);
 
-            var title = await kernel.RunAsync(variables, plugin["Title"]);
+            var title = await kernel.RunAsync(variables, writePlugin["Title"]);
             Console.WriteLine(title);
             variables.Set("title", title.Result);
 
-            var subtitle = await kernel.RunAsync(variables, plugin["Subtitle"]);
+            var subtitle = await kernel.RunAsync(variables, writePlugin["Subtitle"]);
             Console.WriteLine(subtitle);
             variables.Set("subtitle", subtitle.Result);
 
-            var cover = await kernel.RunAsync(variables, plugin["Cover"]);
+            var cover = await kernel.RunAsync(variables, writePlugin["Cover"]);
             Console.WriteLine(cover);
 
             IImageGeneration dallE = kernel.GetService<IImageGeneration>();
