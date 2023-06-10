@@ -11,6 +11,7 @@ using Microsoft.SemanticKernel.SemanticFunctions;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using Spectre.Console;
 
 namespace WriteABlog
 {
@@ -36,10 +37,12 @@ namespace WriteABlog
 
             string apiKey = config.GetSection("apiKey").Value ?? "";
 
+            bool chatGPT = args.Any(arg => arg.Equals("--chatgpt", StringComparison.InvariantCultureIgnoreCase));
+
             if (string.IsNullOrEmpty(apiKey))
             {
-                Console.WriteLine("invalid api key.");
-                return;
+                AnsiConsole.MarkupLine("[red]Invalid API key![/]");
+                return;                
             }
 
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
@@ -52,29 +55,27 @@ namespace WriteABlog
 
             ILogger logger = loggerFactory.CreateLogger("WriteABlog");
             HttpClientHandler httpClientHandler = new HttpClientHandler();
-            TextCompletionLogger textCompletionLogger = new TextCompletionLogger(httpClientHandler, logger);
-
+            ChatGPTHandler chatGPTHandler = new ChatGPTHandler(httpClientHandler, logger , chatGPT);
+            var httpClient = new HttpClient(chatGPTHandler);
             var builder = Kernel.Builder
-                                .WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002", apiKey)
-                                .WithOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey, httpClient: new HttpClient(textCompletionLogger))
-                                .WithOpenAIImageGenerationService(apiKey: apiKey)                                                             
+                                .WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002", apiKey, httpClient: httpClient)
+                                .WithOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey, httpClient: httpClient)
+                                .WithOpenAIImageGenerationService(apiKey: apiKey, httpClient: httpClient)                                                             
                                 .WithMemoryStorage(new VolatileMemoryStore())
                                 .WithLogger(logger);
 
-            IKernel kernel = builder.Build();            
+            IKernel kernel = builder.Build();  
 
-            Console.Write("Please enter the topic: ");
-            string topic = Console.ReadLine() ?? "";
+            string topic = AnsiConsole.Prompt<string>(new TextPrompt<string>("[green]PLEASE ENTER THE TOPIC:[/]")
+                                                .Validate(t =>
+                                                {
+                                                    return !string.IsNullOrEmpty(t);
+                                                }));            
 
-            if (string.IsNullOrEmpty(topic)) {
-                Console.WriteLine("invalid topic.");
-                return;
-            }
-
-            Console.WriteLine("Please enter the reference urls: ");
+            
             List<string> referenceUrls = new List<string>();
             string line;
-            while ((line = Console.ReadLine() ?? "") != "")
+            while ((line = AnsiConsole.Prompt<string>(new TextPrompt<string>("[blue]PLEASE ENTER THE REFERENCE URL:[/]").AllowEmpty())) != "")
             {
                 referenceUrls.Add(line);
             }
@@ -129,13 +130,16 @@ namespace WriteABlog
             var imageUrl = await dallE.GenerateImageAsync(blogStyle.blog.CoverDescription, 1024, 1024);
             blogStyle.blog.CoverUrl = imageUrl;
 
-            using (WebClient client = new WebClient())
+            if (!chatGPT)
             {
-                string url = imageUrl;
-                Uri uri = new Uri(url);
-                string localPath = System.IO.Path.GetFileName(uri.LocalPath);
+                using (WebClient client = new WebClient())
+                {
+                    string url = imageUrl;
+                    Uri uri = new Uri(url);
+                    string localPath = System.IO.Path.GetFileName(uri.LocalPath);
 
-                client.DownloadFile(url, localPath);
+                    client.DownloadFile(url, localPath);
+                }
             }
 
             string[] chapters = SplitIntoChapters(blogStyle.blog.TableOfContents);
@@ -170,6 +174,8 @@ namespace WriteABlog
             {
                 sw.Write(sb.ToString());
             }
+            AnsiConsole.MarkupLine("[red]----------BLOG----------[/]");
+            AnsiConsole.Write(sb.ToString());
         }
 
         static string[] SplitIntoChapters(string blogContent)
