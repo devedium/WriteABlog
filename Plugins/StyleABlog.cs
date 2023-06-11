@@ -1,18 +1,46 @@
 ﻿using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.SkillDefinition;
+using Spectre.Console;
 using WriteABlog;
 
 namespace Plugins
 {
     public class StyleABlog
     {
+        private bool _chatGPT = false;
+        public StyleABlog(bool chatGPT) 
+        {
+            _chatGPT = chatGPT;
+        }
+
         public Blog blog = new Blog();
 
         [SKFunction("return the image style of the cover")]
         public string CoverImageStyle()
+        {          
+            var style = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("SELECT [green]IMAGE STYLE[/]:")
+                    .PageSize(10)
+                    .MoreChoicesText("[grey](MOVE UP AND DOWN TO REVEAL MORE STYLES)[/]")
+                    .AddChoices(new[] {
+                        "Pixel Art", "Abstract Art", "Minimalist",
+                        "Infographic", "Pop Art", "Photographic",
+                        "Satirical Cartoon",
+                    }));
+            return style;
+        }
+
+        [SKFunction("return the image prompt length limit")]
+        public string CoverImagePromptLengthLimit()
         {
-            return "Abstract Art";
-            //example: Pixel Art | Abstract Art | Minimalist | Infographic | Pop Art | Photographic | Satirical Cartoon 
+            if (_chatGPT)
+            {
+                return 400.ToString();
+            }
+            else { 
+                return 1000.ToString(); 
+            }
         }
 
         [SKFunction("blog topic")]

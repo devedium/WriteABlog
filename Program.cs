@@ -102,7 +102,7 @@ namespace WriteABlog
             }
 
             var writePlugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
-            var blogStyle = new Plugins.StyleABlog();
+            var blogStyle = new Plugins.StyleABlog(chatGPT);
             var stylePlugin = kernel.ImportSkill(blogStyle, "StyleABlog");
             kernel.ImportSkill(new TextMemorySkill(collection: topic, relevance: "0.8", limit: "1"));
 
@@ -223,7 +223,7 @@ namespace WriteABlog
             string topic = Console.ReadLine()??"";
 
             var writePlugin = kernel.ImportSemanticSkillFromDirectory("Plugins", "WriteABlog");
-            var stylePlugin = kernel.ImportSkill(new Plugins.StyleABlog(), "StyleABlog");
+            var stylePlugin = kernel.ImportSkill(new Plugins.StyleABlog(false), "StyleABlog");
 
             var variables = new ContextVariables();
             variables.Set("topic", topic);
