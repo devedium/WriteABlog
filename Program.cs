@@ -162,8 +162,9 @@ namespace WriteABlog
         {
             StringBuilder sb = new StringBuilder();            
             sb.AppendLine($"# {blog.Title}");
-            sb.AppendLine($"{blog.Subtitle}\r\n");            
+            sb.AppendLine($"{blog.Subtitle}\r\n"); 
             sb.AppendLine($"![{blog.Title}]({blog.CoverUrl})\r\n");
+            sb.AppendLine($"> {blog.CoverDescription}\r\n");
             sb.AppendLine($"{blog.TableOfContents}\r\n");
             foreach (string chapter in blog.Chapters)
             {
