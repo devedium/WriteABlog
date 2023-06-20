@@ -35,6 +35,8 @@ namespace WriteABlog
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("env") ?? "dev"}.json", optional: true)                
                 .Build();
 
+            Console.TreatControlCAsInput = true;
+
             string apiKey = config.GetSection("apiKey").Value ?? "";
 
             bool chatGPT = args.Any(arg => arg.Equals("--chatgpt", StringComparison.InvariantCultureIgnoreCase));
