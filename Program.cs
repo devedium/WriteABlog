@@ -33,9 +33,7 @@ namespace WriteABlog
                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("env") ?? "dev"}.json", optional: true)                
-                .Build();
-
-            Console.TreatControlCAsInput = true;
+                .Build();            
 
             string apiKey = config.GetSection("apiKey").Value ?? "";
 
