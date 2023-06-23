@@ -176,7 +176,7 @@ namespace WriteABlog
                 sw.Write(sb.ToString());
             }
             AnsiConsole.MarkupLine("[red]----------BLOG----------[/]");
-            AnsiConsole.Write(sb.ToString());
+            Console.Write(sb.ToString());
         }
 
         static string[] SplitIntoChapters(string blogContent)
