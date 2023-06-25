@@ -182,7 +182,7 @@ namespace WriteABlog
         static string[] SplitIntoChapters(string blogContent)
         {
             // Split the content by the chapter number pattern (number followed by dot)
-            string[] chapters = Regex.Split(blogContent, @"(?<=\n)\d+\.");
+            string[] chapters = Regex.Split(blogContent, @"\r?\n\s*\r?\n");
 
             // Remove leading and trailing white spaces from each chapter
             for (int i = 0; i < chapters.Length; i++)
