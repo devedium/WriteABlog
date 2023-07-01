@@ -57,9 +57,19 @@ namespace WriteABlog
             HttpClientHandler httpClientHandler = new HttpClientHandler();
             ChatGPTHandler chatGPTHandler = new ChatGPTHandler(httpClientHandler, logger , chatGPT);
             var httpClient = new HttpClient(chatGPTHandler);
+
+            var textCompletiionModelId = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("SELECT [green]TEXT COMPLETION MODEL[/]:")
+                    .PageSize(10)
+                    .MoreChoicesText("[grey](MOVE UP AND DOWN TO REVEAL MORE MODELS)[/]")
+                    .AddChoices(new[] {
+                        "gpt-4", "gpt-4-32k", "gpt-3.5-turbo",
+                        "gpt-3.5-turbo-16k", "text-davinci-003", "text-davinci-002"                
+                    }));
             var builder = Kernel.Builder
                                 .WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002", apiKey, httpClient: httpClient)
-                                .WithOpenAITextCompletionService(modelId: "text-davinci-003", apiKey: apiKey, httpClient: httpClient)
+                                .WithOpenAITextCompletionService(modelId: textCompletiionModelId, apiKey: apiKey, httpClient: httpClient)
                                 .WithOpenAIImageGenerationService(apiKey: apiKey, httpClient: httpClient)                                                             
                                 .WithMemoryStorage(new VolatileMemoryStore())
                                 .WithLogger(logger);

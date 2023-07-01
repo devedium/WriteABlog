@@ -4,11 +4,17 @@
 
 [Semantic Kernel: A Better Way to Build LLM-Powered Applications](https://devedium.com/semantic-kernel-a-better-way-to-build-llm-powered-applications-d77779cfe16a)
 
-If you don't have an OpenAI API account, you can use it with ChatGPT
+If you don't have an OpenAI API account, you can use it with ChatGPT by manually copy/past the prompt to ChatGPT and copy/past the response back.
 
 ```
 writeablog --chatgpt
 ```
+
+In ChatGPT mode, the references urls (embeddings) are ignore.
+
+Cover image generation is also ignored, you can use:
+* [DALL.E](https://labs.openai.com/)
+* [Bing Image Creator](https://www.bing.com/create)
 
 #### The Art Styles references:
 
