@@ -26,7 +26,11 @@ namespace Plugins
                     .AddChoices(new[] {
                         "Pixel Art", "Abstract Art", "Minimalist",
                         "Infographic", "Pop Art", "Photographic",
-                        "Satirical Cartoon",
+                        "Satirical Cartoon","Impressionism","Expressionism",
+                        "Cubism", "Surrealism", "Art Nouveau", "Romanticism", 
+                        "Realism", "Baroque", "Renaissance Art", "Gothic Art", 
+                        "Neoclassicism", "Fauvism", "Dada", "Optical Art",
+                        "Art Deco", "Conceptual Art", "Digital Art", "Street Art"
                     }));
             return style;
         }
