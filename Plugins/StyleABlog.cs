@@ -46,7 +46,8 @@ namespace Plugins
                         "Cubism", "Surrealism", "Art Nouveau", "Romanticism", 
                         "Realism", "Baroque", "Renaissance Art", "Gothic Art", 
                         "Neoclassicism", "Fauvism", "Dada", "Optical Art",
-                        "Art Deco", "Conceptual Art", "Digital Art", "Street Art"
+                        "Art Deco", "Conceptual Art", "Digital Art", "Street Art",
+                        "Abstract Pencil Art","Water Color Art"
                     }));
             return style;
         }
