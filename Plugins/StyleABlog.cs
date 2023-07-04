@@ -8,12 +8,28 @@ namespace Plugins
     public class StyleABlog
     {
         private bool _chatGPT = false;
+        private string? _targetAudience = null;
         public StyleABlog(bool chatGPT) 
         {
             _chatGPT = chatGPT;
         }
 
         public Blog blog = new Blog();
+
+        [SKFunction("return the blog's target audience")]
+        public string TargetAudience()
+        {
+            if (_targetAudience == null)
+            {
+                _targetAudience = AnsiConsole.Prompt<string>(new TextPrompt<string>("[green]PLEASE ENTER THE TARGET AUDIENCE (FOR EXAMPLE: Stay-at-home parents, Small business owners, ech-savvy individuals, Skilled programmers, C# beginners, 5th graders, etc):[/]")
+                                                    .Validate(t =>
+                                                    {
+                                                        return !string.IsNullOrEmpty(t);
+                                                    }));
+            }
+            return _targetAudience;
+        }
+
 
         [SKFunction("return the image style of the cover")]
         public string CoverImageStyle()
