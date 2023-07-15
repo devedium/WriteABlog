@@ -68,6 +68,6 @@ Cover image generation is also ignored, you can use:
 
 25. **Street Art**: Art created in public locations, usually unsanctioned artwork executed outside of the context of traditional art venues. Banksy is a well-known street artist.
 
-26. **Abstract Pencil Art: Abstract pencil art refers to artwork created using pencils to explore abstract forms, shapes, and compositions.
+26. **Abstract Pencil Art**: Abstract pencil art refers to artwork created using pencils to explore abstract forms, shapes, and compositions.
 
-27. **Water Color Art: Watercolor art is a popular medium known for its transparency, fluidity, and vibrant colors. It involves using water-soluble pigments to create paintings. 
+27. **Water Color Art**: Watercolor art is a popular medium known for its transparency, fluidity, and vibrant colors. It involves using water-soluble pigments to create paintings. 
