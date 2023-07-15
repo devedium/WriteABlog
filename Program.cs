@@ -164,7 +164,13 @@ namespace WriteABlog
                             stylePlugin["Chapter"]);
             }
 
-            SaveBlogToFile(blogStyle.blog, "blog.md");            
+            var fileName = blogStyle.blog.Title;
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            {
+                fileName = fileName.Replace(invalidChar, '_');
+            }            
+
+            SaveBlogToFile(blogStyle.blog, $"{fileName}.md");            
 
         }
 
