@@ -12,6 +12,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using Spectre.Console;
+using System;
 
 namespace WriteABlog
 {
@@ -64,8 +65,7 @@ namespace WriteABlog
                     .PageSize(10)
                     .MoreChoicesText("[grey](MOVE UP AND DOWN TO REVEAL MORE MODELS)[/]")
                     .AddChoices(new[] {
-                        "gpt-4", "gpt-4-32k", "gpt-3.5-turbo",
-                        "gpt-3.5-turbo-16k", "text-davinci-003", "text-davinci-002"                
+                        "text-davinci-003", "text-davinci-002", "davinci", "curie", "babbage", "ada"
                     }));
             var builder = Kernel.Builder
                                 .WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002", apiKey, httpClient: httpClient)
